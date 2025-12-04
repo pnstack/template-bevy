@@ -1,6 +1,6 @@
 # Documentation
 
-Welcome to the template-rust documentation!
+Welcome to the template-bevy documentation!
 
 ## 📚 Available Documentation
 
@@ -10,7 +10,7 @@ Welcome to the template-rust documentation!
 ### Setup & Configuration
 - **[Setup Guide](../SETUP.md)** - Comprehensive setup instructions for all environments
   - Local development
-  - Docker & Docker Compose
+  - Docker
   - Nix & Nix Flakes
   - GitHub Codespaces & Devcontainer
 
@@ -19,7 +19,6 @@ Welcome to the template-rust documentation!
   - CI workflow (build, test, lint)
   - Security auditing
   - Release automation
-  - Docker builds
 
 ### Usage
 - **[Main README](../README.md)** - Project overview, features, and usage examples
@@ -32,7 +31,7 @@ Welcome to the template-rust documentation!
 3. [CI-CD.md](CI-CD.md) - Understand our automated workflows
 
 ### For Users
-1. [../README.md](../README.md) - Learn how to use the application
+1. [../README.md](../README.md) - Learn how to use the game template
 2. [QUICK-START.md](QUICK-START.md) - Quick reference for common tasks
 
 ### For Maintainers
@@ -40,11 +39,6 @@ Welcome to the template-rust documentation!
 2. [../SETUP.md](../SETUP.md) - Supporting different development environments
 
 ## 🔧 Configuration Files Reference
-
-### Docker
-- `/Dockerfile` - Multi-stage Docker build
-- `/docker-compose.yml` - Development and production services
-- `/.dockerignore` - Build optimization
 
 ### Nix
 - `/flake.nix` - Nix flakes configuration
@@ -59,7 +53,6 @@ Welcome to the template-rust documentation!
 - `/.github/workflows/ci.yml` - Build, test, lint
 - `/.github/workflows/security.yml` - Security audits
 - `/.github/workflows/release.yml` - Automated releases
-- `/.github/workflows/docker.yml` - Docker builds
 
 ## 📖 Documentation Standards
 
@@ -75,7 +68,7 @@ When contributing documentation:
 
 Found an issue or want to improve the documentation?
 
-1. Check if there's an [existing issue](https://github.com/pnstack/template-rust/issues)
+1. Check if there's an [existing issue](https://github.com/pnstack/template-bevy/issues)
 2. Open a new issue describing the problem
 3. Submit a PR with improvements
 
@@ -86,9 +79,9 @@ Good documentation helps everyone! 🎉
 If you can't find what you're looking for:
 
 1. Check all documentation files listed above
-2. Search [existing issues](https://github.com/pnstack/template-rust/issues)
-3. Open a [new issue](https://github.com/pnstack/template-rust/issues/new) with your question
+2. Search [existing issues](https://github.com/pnstack/template-bevy/issues)
+3. Open a [new issue](https://github.com/pnstack/template-bevy/issues/new) with your question
 
 ---
 
-**Thank you for reading! 🦀**
+**Thank you for reading! 🦀🎮**

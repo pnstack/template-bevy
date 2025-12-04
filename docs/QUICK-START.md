@@ -13,23 +13,12 @@ Choose your preferred development method and get started in minutes!
 
 ---
 
-### Docker Compose (Simple)
-```bash
-git clone https://github.com/pnstack/template-rust.git
-cd template-rust
-docker compose up
-```
-
-**Best for:** Quick testing, isolated environments
-
----
-
 ### Nix (Reproducible)
 ```bash
-git clone https://github.com/pnstack/template-rust.git
-cd template-rust
+git clone https://github.com/pnstack/template-bevy.git
+cd template-bevy
 nix develop
-cargo run
+cargo run --features dev
 ```
 
 **Best for:** Guaranteed reproducible builds, NixOS users
@@ -42,8 +31,8 @@ cargo run
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Clone and build
-git clone https://github.com/pnstack/template-rust.git
-cd template-rust
+git clone https://github.com/pnstack/template-bevy.git
+cd template-bevy
 cargo build --release
 ```
 
@@ -57,6 +46,8 @@ cargo build --release
 ```bash
 make help          # Show all available commands
 make build         # Build debug version
+make build-dev     # Build with dynamic linking (faster)
+make run           # Run the game
 make test          # Run tests
 make clippy        # Run linter
 make fmt           # Format code
@@ -66,53 +57,35 @@ make all           # Format, lint, test, and build
 ### Using Cargo
 ```bash
 cargo build                      # Debug build
+cargo build --features dev       # Fast dev build with dynamic linking
 cargo build --release            # Optimized build
 cargo test                       # Run tests
 cargo clippy -- -D warnings      # Lint
 cargo fmt                        # Format
-```
-
-### Using Docker
-```bash
-docker build -t template-rust .                    # Build image
-docker run --rm template-rust --help               # Show help
-docker run --rm -it template-rust tui              # Interactive TUI
-```
-
-### Using Docker Compose
-```bash
-docker compose up                  # Start app
-docker compose up dev              # Development mode
-docker compose down                # Stop services
+cargo run --features dev         # Run the game
 ```
 
 ---
 
 ## 🎯 First Steps After Setup
 
-1. **Run the application:**
+1. **Run the game:**
    ```bash
-   cargo run -- --help
+   cargo run --features dev
    ```
 
-2. **Try the TUI:**
-   ```bash
-   cargo run -- tui
-   ```
+2. **Controls:**
+   - **WASD** or **Arrow Keys** - Move player
+   - **ESC** - Quit game
 
-3. **Add a todo:**
-   ```bash
-   cargo run -- add "My first task"
-   ```
-
-4. **List todos:**
-   ```bash
-   cargo run -- list
-   ```
-
-5. **Run tests:**
+3. **Run tests:**
    ```bash
    cargo test
+   ```
+
+4. **Check the example:**
+   ```bash
+   cargo run --example basic_usage --features dev
    ```
 
 ---
@@ -127,42 +100,34 @@ docker compose down                # Stop services
 
 ## ❓ Troubleshooting
 
-### "SQLite not found"
+### "Missing audio libraries" (Linux)
 ```bash
 # Ubuntu/Debian
-sudo apt-get install libsqlite3-dev
+sudo apt-get install libasound2-dev libudev-dev
 
-# macOS
-brew install sqlite
-
-# Nix/Codespaces - Already included!
-```
-
-### "OpenSSL not found"
-```bash
-# Ubuntu/Debian
-sudo apt-get install libssl-dev pkg-config
-
-# macOS
-brew install openssl
+# Fedora
+sudo dnf install alsa-lib-devel systemd-devel
 
 # Nix/Codespaces - Already included!
 ```
 
 ### "Slow first build"
-This is normal! Cargo compiles all dependencies on first build.
+This is normal! Bevy has many dependencies that need to compile on first build.
 Subsequent builds are much faster (seconds instead of minutes).
 
-### Docker permission issues
-```bash
-# Create data directory with proper permissions
-mkdir -p data
-chmod 777 data
-```
+**Tips for faster iteration:**
+- Use `--features dev` for dynamic linking
+- Use `cargo check` for quick syntax checks
+- Use `cargo watch` for automatic rebuilds
 
 ---
 
 ## 🎓 Learning Resources
+
+### Bevy
+- [Bevy Book](https://bevyengine.org/learn/book/)
+- [Bevy Cheat Book](https://bevy-cheatbook.github.io/)
+- [Bevy Examples](https://bevyengine.org/examples/)
 
 ### Rust Basics
 - [The Rust Book](https://doc.rust-lang.org/book/)
@@ -173,20 +138,15 @@ chmod 777 data
 - Check [tests/](../tests/) for testing examples
 - Read [examples/](../examples/) for usage patterns
 
-### Development Tools
-- [Cargo Book](https://doc.rust-lang.org/cargo/)
-- [Clippy Lints](https://rust-lang.github.io/rust-clippy/)
-- [Rustfmt Configuration](https://rust-lang.github.io/rustfmt/)
-
 ---
 
 ## 💡 Tips
 
-1. **Use rust-analyzer**: Best IDE support for Rust
-2. **Run clippy often**: Catches bugs early
-3. **Format before commit**: `cargo fmt` or `make fmt`
-4. **Test frequently**: `cargo test` or `make test`
-5. **Use `--release` for production**: Much faster
+1. **Use `--features dev`**: Dynamic linking speeds up compile times dramatically
+2. **Use rust-analyzer**: Best IDE support for Rust
+3. **Run clippy often**: Catches bugs early
+4. **Format before commit**: `cargo fmt` or `make fmt`
+5. **Test frequently**: `cargo test` or `make test`
 
 ---
 
@@ -207,9 +167,9 @@ Ready to contribute?
 ## 📞 Getting Help
 
 - 📖 Read the [full docs](../README.md)
-- 🐛 [Open an issue](https://github.com/pnstack/template-rust/issues)
-- 💬 Check [existing issues](https://github.com/pnstack/template-rust/issues?q=is%3Aissue)
+- 🐛 [Open an issue](https://github.com/pnstack/template-bevy/issues)
+- 💬 Check [existing issues](https://github.com/pnstack/template-bevy/issues?q=is%3Aissue)
 
 ---
 
-**Happy coding! 🦀**
+**Happy game development! 🦀🎮**

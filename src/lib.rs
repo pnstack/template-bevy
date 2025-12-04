@@ -1,28 +1,17 @@
-//! Template Rust - Todo App Example
+//! Template Bevy - Game Development Template
 //!
-//! This is a template Rust project featuring a todo application with SQLite database
-//! and terminal user interface (TUI).
+//! A Bevy game template designed for indie game developers.
+//! This template provides a solid foundation with organized modules
+//! for components, systems, resources, states, and plugins.
 
-pub mod database;
-pub mod models;
-pub mod tui;
+pub mod components;
+pub mod game;
+pub mod plugins;
+pub mod resources;
+pub mod states;
+pub mod systems;
 
-pub use models::*;
-
-/// Application result type
-pub type Result<T> = anyhow::Result<T>;
-
-/// Application configuration
-#[derive(Debug, Clone)]
-pub struct Config {
-    /// Database file path
-    pub database_url: String,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            database_url: "todo.db".to_string(),
-        }
-    }
-}
+pub use components::*;
+pub use game::*;
+pub use resources::*;
+pub use states::*;

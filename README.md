@@ -1,152 +1,163 @@
-# Template Rust
+# Template Bevy
 
-A Rust project template featuring a todo application with SQLite database and terminal user interface (TUI).
+A Bevy game engine template designed for indie game developers. This template provides a solid foundation with organized modules for components, systems, resources, states, and plugins.
 
 ## Features
 
-- 📝 Todo management with SQLite persistence
-- 🖥️ Interactive Terminal User Interface (TUI)
-- 🔧 Command Line Interface (CLI)
+- 🎮 Bevy game engine with ECS architecture
+- 📁 Organized folder structure for game development
+- 🧩 Modular plugin system
+- 🎯 Game state management (Loading, Menu, Playing, Paused, GameOver)
+- 🏃 Movement and physics components
+- ❤️ Health and combat systems
+- 🎵 Audio and settings resources
 - 🧪 Comprehensive test suite
 - 🚀 CI/CD with GitHub Actions
-- 📦 Cross-platform releases
-- 🔒 Security auditing
-- 🐳 Docker and Docker Compose support
+- 📦 Cross-platform builds
+- 🐳 Docker support
 - ❄️ Nix flakes for reproducible environments
-- 📦 Devcontainer configuration for GitHub Codespaces
 
 ## Installation
-
-> **💡 Quick Start**: See [SETUP.md](SETUP.md) for detailed setup instructions using Docker, Nix, Codespaces, or local development.
 
 ### From Source
 
 ```bash
-git clone https://github.com/pnstack/template-rust.git
-cd template-rust
+git clone https://github.com/pnstack/template-bevy.git
+cd template-bevy
 cargo build --release
+```
+
+### Quick Development Build
+
+For faster compile times during development, use the `dev` feature:
+
+```bash
+cargo run --features dev
 ```
 
 ### From Releases
 
-Download the latest binary from the [Releases](https://github.com/pnstack/template-rust/releases) page.
-
-### With Docker
-
-```bash
-# Build the image
-docker build -t template-rust:latest .
-
-# Run with interactive TUI
-docker run --rm -it -v $(pwd)/data:/app/data template-rust:latest tui
-
-# Or use Docker Compose
-docker compose up
-```
-
-### With Nix
-
-```bash
-# Enter development environment
-nix develop
-
-# Or run directly
-nix run
-```
-
-### With GitHub Codespaces
-
-Click the "Code" button on GitHub and select "Create codespace on main" - everything is pre-configured!
+Download the latest binary from the [Releases](https://github.com/pnstack/template-bevy/releases) page.
 
 ## Usage
 
-### Command Line Interface
+### Running the Game
 
 ```bash
-# Show help
-./template-rust --help
+# Development build (faster compilation)
+cargo run --features dev
 
-# Add a new todo
-./template-rust add "Buy groceries" --description "Milk, eggs, bread"
-
-# List all todos
-./template-rust list
-
-# List only completed todos
-./template-rust list --completed
-
-# List only pending todos
-./template-rust list --pending
-
-# Complete a todo (use the ID from list command)
-./template-rust complete <todo-id>
-
-# Delete a todo
-./template-rust delete <todo-id>
-
-# Start interactive TUI (default mode)
-./template-rust tui
+# Release build (optimized)
+cargo run --release
 ```
 
-### Terminal User Interface (TUI)
+### Controls
 
-Start the interactive mode:
-
-```bash
-./template-rust tui
-```
-
-#### TUI Commands:
-- `h` - Show help
-- `n` - Add new todo
-- `d` - Delete selected todo
-- `c` - Toggle todo completion status
-- `a` - Show all todos
-- `p` - Show pending todos only
-- `f` - Show completed todos only
-- `↑↓` - Navigate todos
-- `q` - Quit application
+- **WASD** or **Arrow Keys** - Move player
+- **ESC** - Quit game
 
 ## Project Structure
 
 ```
-template-rust/
+template-bevy/
 ├── .github/workflows/    # CI/CD workflows
 ├── src/
-│   ├── database/         # Database layer
-│   ├── models/           # Data models
-│   ├── tui/              # Terminal UI
+│   ├── components/       # ECS components (Player, Health, Speed, etc.)
+│   ├── systems/          # ECS systems (movement, setup, etc.)
+│   ├── resources/        # Global resources (Score, Settings, Timer)
+│   ├── states/           # Game states (Loading, Menu, Playing, etc.)
+│   ├── plugins/          # Custom Bevy plugins
+│   ├── game/             # Core game logic and constants
 │   ├── lib.rs            # Library root
-│   └── main.rs           # CLI application
+│   └── main.rs           # Application entry point
+├── assets/
+│   ├── textures/         # Sprites and images
+│   ├── audio/            # Music and sound effects
+│   └── fonts/            # Custom fonts
 ├── tests/                # Integration tests
-├── docs/                 # Documentation
-└── examples/             # Usage examples
+├── examples/             # Usage examples
+└── docs/                 # Documentation
+```
+
+## Architecture
+
+### Components
+
+Components are data containers attached to entities:
+
+```rust
+use template_bevy::components::{Player, Health, Speed};
+
+// Spawn a player entity
+commands.spawn((
+    Player,
+    Health::new(100.0),
+    Speed(200.0),
+    Transform::default(),
+));
+```
+
+### Systems
+
+Systems process entities with specific components:
+
+```rust
+fn player_movement(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut query: Query<(&Speed, &mut Transform), With<Player>>,
+) {
+    // Movement logic here
+}
+```
+
+### Resources
+
+Resources are global state:
+
+```rust
+use template_bevy::resources::{Score, GameSettings};
+
+fn update_score(mut score: ResMut<Score>) {
+    score.add(100);
+}
+```
+
+### States
+
+States control game flow:
+
+```rust
+use template_bevy::states::GameState;
+
+app.add_systems(Update, gameplay_system.run_if(in_state(GameState::Playing)));
 ```
 
 ## Development
 
-> **📚 Full Setup Guide**: See [SETUP.md](SETUP.md) for comprehensive development environment setup instructions.
-
 ### Prerequisites
 
-Choose your preferred development method:
+- Rust 1.70 or later
+- For Linux: `libasound2-dev`, `libudev-dev` (audio and input support)
 
-- **Local**: Rust 1.70 or later, SQLite3
-- **Docker**: Docker 20.10+ and Docker Compose
-- **Nix**: Nix package manager with flakes enabled
-- **Codespaces**: Just a GitHub account!
+```bash
+# Ubuntu/Debian
+sudo apt-get install libasound2-dev libudev-dev
+
+# Fedora
+sudo dnf install alsa-lib-devel systemd-devel
+```
 
 ### Building
 
 ```bash
-# Local
+# Debug build
 cargo build
 
-# Docker
-docker compose up --build
+# Release build (optimized)
+cargo build --release
 
-# Nix
-nix build
+# Development build with dynamic linking (faster iteration)
+cargo build --features dev
 ```
 
 ### Running Tests
@@ -167,39 +178,44 @@ cargo clippy -- -D warnings
 cargo fmt
 ```
 
-### Development Environments
+## Adding Game Content
 
-The project provides multiple development environment options:
+### Adding a New Component
 
-- **Docker Compose**: `docker compose up dev` - Containerized development with live code mounting
-- **Nix Flakes**: `nix develop` - Reproducible environment with all dependencies
-- **Devcontainer**: Open in VS Code or GitHub Codespaces - Fully configured IDE
-- **Traditional**: Local Rust installation with cargo
+1. Create the component in `src/components/mod.rs`:
 
-## Database
-
-The application uses SQLite for persistence. By default, it creates a `todo.db` file in the current directory. You can specify a different database path:
-
-```bash
-./template-rust --database /path/to/your/todos.db list
+```rust
+#[derive(Component, Debug)]
+pub struct Enemy {
+    pub damage: f32,
+}
 ```
 
-For testing with in-memory database:
+2. Export it in the module.
 
-```bash
-./template-rust --database ":memory:" add "Test todo"
+### Adding a New System
+
+1. Create a new file in `src/systems/`:
+
+```rust
+pub fn enemy_ai(query: Query<&Transform, With<Enemy>>) {
+    // AI logic
+}
 ```
 
-## CI/CD
+2. Export it in `src/systems/mod.rs`
+3. Register it in `src/plugins/mod.rs`
 
-The project includes comprehensive GitHub Actions workflows:
+### Adding a New State
 
-- **CI** (`ci.yml`): Build, test, lint, and format checks on multiple platforms (Linux, macOS, Windows)
-- **Security** (`security.yml`): Weekly security audits with `cargo audit`
-- **Release** (`release.yml`): Automated binary releases for Linux, macOS, and Windows on version tags
-- **Docker** (`docker.yml`): Docker image build testing and docker-compose validation
+1. Add the state variant in `src/states/mod.rs`
+2. Add state-specific systems in your plugin
 
-All workflows run automatically on push and pull requests to ensure code quality and security.
+## Performance Tips
+
+1. Use `--features dev` during development for faster compile times
+2. Use `--release` for testing actual game performance
+3. The template includes optimized dependency builds by default
 
 ## Contributing
 
