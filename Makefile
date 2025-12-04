@@ -1,4 +1,4 @@
-.PHONY: help build test clean docker-build docker-run docker-compose-up docker-compose-down
+.PHONY: help build test clean docker-build docker-run
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -9,8 +9,17 @@ help: ## Show this help message
 build: ## Build the project in debug mode
 	cargo build
 
+build-dev: ## Build the project with dynamic linking (faster)
+	cargo build --features dev
+
 build-release: ## Build the project in release mode
 	cargo build --release
+
+run: ## Run the game in development mode
+	cargo run --features dev
+
+run-release: ## Run the game in release mode
+	cargo run --release
 
 test: ## Run all tests
 	cargo test
@@ -31,18 +40,9 @@ clean: ## Clean build artifacts
 	cargo clean
 
 docker-build: ## Build Docker image
-	docker build -t template-rust:latest .
+	docker build -t template-bevy:latest .
 
-docker-run: ## Run Docker container in TUI mode
-	docker run --rm -it -v $(PWD)/data:/app/data template-rust:latest tui
-
-docker-compose-up: ## Start services with docker-compose
-	docker compose up
-
-docker-compose-down: ## Stop services with docker-compose
-	docker compose down
-
-docker-compose-dev: ## Start development service with docker-compose
-	docker compose up dev
+docker-run: ## Run Docker container
+	docker run --rm template-bevy:latest
 
 all: fmt clippy test build ## Run format, clippy, test, and build

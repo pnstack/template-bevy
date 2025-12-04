@@ -21,16 +21,18 @@ The project uses GitHub Actions for automated testing, building, and releasing. 
 - Steps:
   1. Checkout code
   2. Install Rust stable
-  3. Cache dependencies (Cargo registry, git, and target directory)
-  4. Run `cargo test --verbose`
+  3. Install Linux dependencies (alsa, udev)
+  4. Cache dependencies (Cargo registry, git, and target directory)
+  5. Run `cargo test --verbose`
 
 #### Clippy (Linter)
 - Runs on: Ubuntu Latest
 - Steps:
   1. Checkout code
   2. Install Rust stable with clippy component
-  3. Cache dependencies
-  4. Run `cargo clippy -- -D warnings` (fails on any warnings)
+  3. Install Linux dependencies
+  4. Cache dependencies
+  5. Run `cargo clippy -- -D warnings` (fails on any warnings)
 
 #### Rustfmt (Code Formatting)
 - Runs on: Ubuntu Latest
@@ -44,8 +46,9 @@ The project uses GitHub Actions for automated testing, building, and releasing. 
 - Steps:
   1. Checkout code
   2. Install Rust stable
-  3. Cache dependencies
-  4. Run `cargo build --verbose --release`
+  3. Install platform-specific dependencies
+  4. Cache dependencies
+  5. Run `cargo build --verbose --release`
 
 **Purpose:** Ensures code quality, passes tests, follows formatting standards, and builds successfully on all target platforms.
 
@@ -85,9 +88,10 @@ The project uses GitHub Actions for automated testing, building, and releasing. 
 - Steps:
   1. Checkout code
   2. Install Rust stable with target
-  3. Cache dependencies (per target)
-  4. Build release binary: `cargo build --release --target <target>`
-  5. Upload artifact with platform-specific name
+  3. Install platform-specific dependencies
+  4. Cache dependencies (per target)
+  5. Build release binary: `cargo build --release --target <target>`
+  6. Upload artifact with platform-specific name
 
 #### Create Release
 - Depends on: build-and-release
@@ -113,32 +117,6 @@ git push origin v0.1.0
 # 2. Create a GitHub release
 # 3. Upload binaries as release assets
 ```
-
-### 4. Docker Workflow (`docker.yml`)
-
-**Triggers:**
-- Push to `main` branch
-- Pull requests to `main` branch
-
-**Jobs:**
-
-#### Docker Build Test
-- Runs on: Ubuntu Latest
-- Steps:
-  1. Checkout code
-  2. Set up Docker Buildx
-  3. Build Docker image with cache
-  4. Test Docker image (run help command)
-
-**Purpose:** Ensures Docker image builds successfully and can run basic commands.
-
-#### Docker Compose Validation
-- Runs on: Ubuntu Latest
-- Steps:
-  1. Checkout code
-  2. Validate `docker-compose.yml` syntax
-
-**Purpose:** Ensures docker-compose configuration is valid.
 
 ## Caching Strategy
 
@@ -168,41 +146,15 @@ To ensure code quality, consider enabling branch protection rules for `main`:
 3. **Require branches to be up to date**: Prevent merge conflicts
 4. **Require linear history**: Keep history clean
 
-## Adding New Workflows
+## Linux Dependencies
 
-### Example: Add a Coverage Workflow
+For Bevy projects on Linux, the CI workflows install:
 
-Create `.github/workflows/coverage.yml`:
-
-```yaml
-name: Coverage
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-jobs:
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-      
-      - name: Install tarpaulin
-        run: cargo install cargo-tarpaulin
-      
-      - name: Generate coverage
-        run: cargo tarpaulin --out Xml
-      
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./cobertura.xml
+```bash
+sudo apt-get install -y libasound2-dev libudev-dev
 ```
+
+These are required for audio and input handling.
 
 ## Best Practices
 
@@ -210,6 +162,7 @@ jobs:
 - Use caching extensively
 - Run jobs in parallel when possible
 - Use matrix builds for multiple platforms
+- Use `--features dev` for faster debug builds when possible
 
 ### 2. Fail Fast
 - Use `-- -D warnings` for clippy to catch issues early
@@ -275,24 +228,6 @@ jobs:
    - Waiting for upstream fix
    - Documenting known issue
 
-## Monitoring
-
-### Workflow Status
-
-Monitor workflow runs:
-- GitHub repository → Actions tab
-- View logs for failed runs
-- Check timing to optimize performance
-
-### Notifications
-
-Enable notifications for:
-- Failed workflow runs on main branch
-- Security vulnerabilities
-- Failed releases
-
-Configure in: GitHub Settings → Notifications
-
 ## Local Testing
 
 Before pushing, test locally:
@@ -306,31 +241,13 @@ cargo fmt --check
 cargo clippy -- -D warnings
 cargo test
 cargo build --release
-
-# Test Docker
-docker build -t template-rust:test .
-docker run --rm template-rust:test --help
-
-# Validate docker-compose
-docker compose config
 ```
-
-## Future Improvements
-
-Consider adding:
-
-1. **Code Coverage**: Track test coverage with codecov or coveralls
-2. **Benchmarking**: Automated performance regression testing
-3. **Deploy to Registry**: Publish Docker images to GitHub Container Registry
-4. **Nightly Builds**: Test against Rust nightly to catch future issues
-5. **Dependency Updates**: Automated PRs for dependency updates (Dependabot)
-6. **Documentation Deployment**: Auto-deploy docs to GitHub Pages
 
 ## Resources
 
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Rust CI/CD Guide](https://doc.rust-lang.org/cargo/guide/continuous-integration.html)
-- [Actions for Rust](https://github.com/actions-rs)
+- [Bevy Setup Guide](https://bevyengine.org/learn/book/getting-started/setup/)
 - [Semantic Versioning](https://semver.org/)
 
 ## Questions or Issues

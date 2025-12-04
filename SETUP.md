@@ -1,6 +1,6 @@
 # Setup Guide
 
-This guide will help you set up the development environment for template-rust using various methods.
+This guide will help you set up the development environment for template-bevy using various methods.
 
 ## Table of Contents
 
@@ -9,7 +9,6 @@ This guide will help you set up the development environment for template-rust us
 - [Setup Methods](#setup-methods)
   - [Local Development](#local-development)
   - [Docker](#docker)
-  - [Docker Compose](#docker-compose)
   - [Nix](#nix)
   - [GitHub Codespaces / Devcontainer](#github-codespaces--devcontainer)
 - [Building the Project](#building-the-project)
@@ -20,7 +19,7 @@ This guide will help you set up the development environment for template-rust us
 
 Choose one of the following setup methods based on your preference:
 
-- **Local Development**: Rust 1.70+, SQLite3
+- **Local Development**: Rust 1.70+, platform-specific dependencies
 - **Docker**: Docker 20.10+ and Docker Compose (optional)
 - **Nix**: Nix package manager with flakes enabled
 - **Codespaces**: GitHub account (no local setup required)
@@ -30,8 +29,8 @@ Choose one of the following setup methods based on your preference:
 The fastest way to get started depends on your environment:
 
 ```bash
-# Local development
-cargo run -- --help
+# Local development (with dynamic linking for faster builds)
+cargo run --features dev
 
 # Docker
 docker compose up
@@ -56,32 +55,39 @@ cargo run
    source $HOME/.cargo/env
    ```
 
-2. **Install SQLite** (if not already installed):
+2. **Install platform-specific dependencies**:
    
    - **Ubuntu/Debian**:
      ```bash
      sudo apt-get update
-     sudo apt-get install sqlite3 libsqlite3-dev
+     sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
+     ```
+   
+   - **Fedora**:
+     ```bash
+     sudo dnf install pkgconfig alsa-lib-devel systemd-devel
      ```
    
    - **macOS**:
-     ```bash
-     brew install sqlite
-     ```
+     No additional dependencies needed.
    
    - **Windows**:
-     Download from [SQLite Download Page](https://www.sqlite.org/download.html)
+     No additional dependencies needed.
 
 3. **Clone and build**:
    ```bash
-   git clone https://github.com/pnstack/template-rust.git
-   cd template-rust
+   git clone https://github.com/pnstack/template-bevy.git
+   cd template-bevy
    cargo build --release
    ```
 
-4. **Run the application**:
+4. **Run the game**:
    ```bash
-   cargo run -- --help
+   # Development build (faster compilation)
+   cargo run --features dev
+   
+   # Release build (optimized)
+   cargo run --release
    ```
 
 #### Development Tools
@@ -105,77 +111,13 @@ rustup component add rust-analyzer
 
 1. **Build the Docker image**:
    ```bash
-   docker build -t template-rust:latest .
+   docker build -t template-bevy:latest .
    ```
 
 2. **Run the container**:
    ```bash
-   # Run with help
-   docker run --rm template-rust:latest --help
-
-   # Run TUI mode (interactive)
-   docker run --rm -it -v $(pwd)/data:/app/data template-rust:latest tui
-
-   # Run CLI commands
-   docker run --rm -v $(pwd)/data:/app/data template-rust:latest list
+   docker run --rm template-bevy:latest --help
    ```
-
-3. **Persist data**:
-   
-   The container stores data in `/app/data`. Mount a volume to persist data:
-   ```bash
-   mkdir -p data
-   docker run --rm -it -v $(pwd)/data:/app/data template-rust:latest tui
-   ```
-
-### Docker Compose
-
-Docker Compose simplifies multi-service development and provides predefined configurations.
-
-#### Running with Docker Compose
-
-1. **Start the application**:
-   ```bash
-   docker compose up template-rust
-   ```
-
-2. **Start in development mode**:
-   ```bash
-   # Development mode with live code mounting
-   docker compose up dev
-   ```
-
-3. **Build and run**:
-   ```bash
-   docker compose up --build
-   ```
-
-4. **Run in detached mode**:
-   ```bash
-   docker compose up -d
-   ```
-
-5. **Stop services**:
-   ```bash
-   docker compose down
-   ```
-
-#### Development Workflow
-
-The `dev` service in docker-compose.yml provides:
-- Live code mounting for rapid development
-- Cargo cache for faster builds
-- Interactive terminal access
-
-```bash
-# Enter development container
-docker compose run --rm dev bash
-
-# Inside container
-cargo build
-cargo test
-cargo run -- tui
-```
 
 ### Nix
 
@@ -204,7 +146,7 @@ Nix provides reproducible development environments across different systems.
    nix build
    ```
 
-4. **Run the application**:
+4. **Run the game**:
    ```bash
    nix run
    ```
@@ -218,34 +160,6 @@ nix-shell
 ```
 
 This provides the same development environment using `shell.nix`.
-
-#### Direnv Integration (Optional)
-
-For automatic environment activation:
-
-1. **Install direnv**:
-   ```bash
-   # Via Nix
-   nix-env -iA nixpkgs.direnv
-   
-   # Via package manager
-   # Ubuntu/Debian: sudo apt install direnv
-   # macOS: brew install direnv
-   ```
-
-2. **Configure direnv**:
-   ```bash
-   # Add to ~/.bashrc or ~/.zshrc
-   eval "$(direnv hook bash)"  # or zsh
-   ```
-
-3. **Create .envrc**:
-   ```bash
-   echo "use flake" > .envrc
-   direnv allow
-   ```
-
-Now the environment activates automatically when you enter the directory!
 
 ### GitHub Codespaces / Devcontainer
 
@@ -284,10 +198,10 @@ If you have Docker and VS Code locally:
 
 ## Building the Project
 
-### Development Build
+### Development Build (Faster Compilation)
 
 ```bash
-cargo build
+cargo build --features dev
 ```
 
 ### Release Build (Optimized)
@@ -296,7 +210,7 @@ cargo build
 cargo build --release
 ```
 
-The binary will be in `target/release/template-rust`.
+The binary will be in `target/release/template-bevy`.
 
 ### Checking Code Without Building
 
@@ -358,73 +272,59 @@ cargo clippy -- -D warnings
 
 ## Common Issues
 
-### Issue: SQLite not found
+### Issue: Missing audio libraries (Linux)
 
-**Solution**: Install SQLite development libraries
-
-```bash
-# Ubuntu/Debian
-sudo apt-get install libsqlite3-dev
-
-# macOS
-brew install sqlite
-
-# Nix
-nix develop  # Automatically provides SQLite
-```
-
-### Issue: OpenSSL not found
-
-**Solution**: Install OpenSSL development libraries
+**Solution**: Install ALSA development libraries
 
 ```bash
 # Ubuntu/Debian
-sudo apt-get install libssl-dev pkg-config
+sudo apt-get install libasound2-dev
 
-# macOS
-brew install openssl
-export PKG_CONFIG_PATH="/usr/local/opt/openssl/lib/pkgconfig"
-
-# Nix
-nix develop  # Automatically provides OpenSSL
+# Fedora
+sudo dnf install alsa-lib-devel
 ```
 
-### Issue: Cargo is slow on first build
+### Issue: Missing udev libraries (Linux)
 
-**Solution**: This is normal - Cargo downloads and compiles all dependencies on first build. Subsequent builds are much faster due to caching.
-
-For Docker users, the multi-stage build and layer caching help reduce rebuild times.
-
-### Issue: Permission denied in Docker
-
-**Solution**: The container runs as non-root user. Ensure mounted volumes have appropriate permissions:
+**Solution**: Install udev development libraries
 
 ```bash
-mkdir -p data
-chmod 777 data  # Or use appropriate user/group ownership
+# Ubuntu/Debian
+sudo apt-get install libudev-dev
+
+# Fedora
+sudo dnf install systemd-devel
 ```
 
-### Issue: Database locked
+### Issue: Slow compilation times
 
-**Solution**: Close any other instances of the application accessing the same database file, or use a different database path:
+**Solution**: Use dynamic linking during development
 
 ```bash
-./template-rust --database another.db tui
+cargo run --features dev
 ```
+
+### Issue: Bevy takes a long time to compile
+
+**Solution**: This is normal for the first build - Bevy has many dependencies. Subsequent builds are much faster due to incremental compilation.
+
+Tips for faster iteration:
+- Use `cargo check` instead of `cargo build` when just checking for errors
+- Use `--features dev` for dynamic linking
+- Consider using `cargo watch` for automatic rebuilds
 
 ## Environment Variables
 
-The application supports the following environment variables:
+The game supports the following environment variables:
 
-- `DATABASE_URL`: Path to the SQLite database file (default: `todo.db`)
 - `RUST_BACKTRACE`: Set to `1` or `full` for detailed error traces
 - `RUST_LOG`: Set log level (e.g., `debug`, `info`, `warn`, `error`)
 
 Example:
 
 ```bash
-export DATABASE_URL=":memory:"  # Use in-memory database
-export RUST_BACKTRACE=1          # Enable backtraces
+export RUST_BACKTRACE=1
+export RUST_LOG=info
 cargo run
 ```
 
@@ -435,14 +335,14 @@ After setting up your environment:
 1. Read the [README.md](README.md) for usage instructions
 2. Explore the [examples/](examples/) directory
 3. Check the [tests/](tests/) directory for test examples
-4. Review the [CI/CD workflows](.github/workflows/) to understand the automation
+4. Review the [src/](src/) directory structure for the game architecture
 
 ## Getting Help
 
 If you encounter issues:
 
 1. Check this guide's [Common Issues](#common-issues) section
-2. Search existing [GitHub Issues](https://github.com/pnstack/template-rust/issues)
+2. Search existing [GitHub Issues](https://github.com/pnstack/template-bevy/issues)
 3. Open a new issue with:
    - Your setup method (Local/Docker/Nix/Codespaces)
    - Operating system and version

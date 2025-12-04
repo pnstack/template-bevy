@@ -1,19 +1,28 @@
 [package]
-name = "template-rust"
+name = "template-bevy"
 version = "0.1.0"
 edition = "2021"
 authors = ["pnstack"]
-description = "A Rust template with todo app example using SQLite and TUI"
+description = "A Bevy game template for indie game developers"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/pnstack/template-rust"
+repository = "https://github.com/pnstack/template-bevy"
 
 [dependencies]
-sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite", "chrono"] }
-ratatui = "0.24"
-crossterm = "0.27"
-clap = { version = "4.4", features = ["derive"] }
-tokio = { version = "1.0", features = ["full"] }
+bevy = "0.14"
+rand = "0.8"
 serde = { version = "1.0", features = ["derive"] }
-chrono = { version = "0.4", features = ["serde"] }
-uuid = { version = "1.6", features = ["v4"] }
-anyhow = "1.0"
+
+[dev-dependencies]
+
+[features]
+default = []
+dev = ["bevy/dynamic_linking"]
+
+# Enable optimizations for dependencies (incl. Bevy) but not for our code
+[profile.dev.package."*"]
+opt-level = 3
+
+# Enable high optimizations for release builds
+[profile.release]
+lto = "thin"
+codegen-units = 1
