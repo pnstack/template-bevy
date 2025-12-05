@@ -8,7 +8,7 @@ use crate::components::{
 
 /// Spawns a 2D camera for the game
 pub fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2d);
+    commands.spawn(Camera2dBundle::default());
 }
 
 /// Spawns the player entity with platformer components
@@ -24,12 +24,15 @@ pub fn spawn_player(mut commands: Commands) {
         Grounded(false),
         JumpConfig::default(),
         BoxCollider::new(player_size.x, player_size.y),
-        Sprite {
-            color: Color::srgb(0.2, 0.6, 1.0), // Blue player
-            custom_size: Some(player_size),
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::srgb(0.2, 0.6, 1.0), // Blue player
+                custom_size: Some(player_size),
+                ..default()
+            },
+            transform: Transform::from_xyz(0.0, 100.0, 0.0),
             ..default()
         },
-        Transform::from_xyz(0.0, 100.0, 0.0),
     ));
 }
 
@@ -41,12 +44,15 @@ pub fn spawn_platforms(mut commands: Commands) {
     commands.spawn((
         Platform,
         BoxCollider::new(ground_width, ground_height),
-        Sprite {
-            color: Color::srgb(0.4, 0.3, 0.2), // Brown ground
-            custom_size: Some(Vec2::new(ground_width, ground_height)),
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::srgb(0.4, 0.3, 0.2), // Brown ground
+                custom_size: Some(Vec2::new(ground_width, ground_height)),
+                ..default()
+            },
+            transform: Transform::from_xyz(0.0, -250.0, 0.0),
             ..default()
         },
-        Transform::from_xyz(0.0, -250.0, 0.0),
     ));
 
     // Floating platforms
@@ -62,12 +68,15 @@ pub fn spawn_platforms(mut commands: Commands) {
         commands.spawn((
             Platform,
             BoxCollider::new(width, height),
-            Sprite {
-                color: Color::srgb(0.3, 0.5, 0.3), // Green platforms
-                custom_size: Some(Vec2::new(width, height)),
+            SpriteBundle {
+                sprite: Sprite {
+                    color: Color::srgb(0.3, 0.5, 0.3), // Green platforms
+                    custom_size: Some(Vec2::new(width, height)),
+                    ..default()
+                },
+                transform: Transform::from_xyz(x, y, 0.0),
                 ..default()
             },
-            Transform::from_xyz(x, y, 0.0),
         ));
     }
 }
