@@ -6,6 +6,9 @@ use crate::components::{
     BoxCollider, Gravity, Grounded, JumpConfig, Platform, Player, Speed, Velocity,
 };
 
+/// Threshold for detecting landing on platforms (in pixels)
+const LANDING_THRESHOLD: f32 = 10.0;
+
 /// Handles player horizontal movement input (A/D or Left/Right arrows)
 pub fn player_movement(
     keyboard_input: Res<ButtonInput<KeyCode>>,
@@ -89,7 +92,6 @@ pub fn check_platform_collisions(
 
             let platform_left = platform_transform.translation.x - platform_half_width;
             let platform_right = platform_transform.translation.x + platform_half_width;
-            let _platform_bottom = platform_transform.translation.y - platform_half_height;
             let platform_top = platform_transform.translation.y + platform_half_height;
 
             // Check for horizontal overlap
@@ -99,9 +101,8 @@ pub fn check_platform_collisions(
             if horizontal_overlap && velocity.0.y <= 0.0 {
                 // Check if player's bottom is at or slightly below platform top
                 // and player was above platform before
-                let landing_threshold = 10.0;
                 if player_bottom <= platform_top
-                    && player_bottom >= platform_top - landing_threshold
+                    && player_bottom >= platform_top - LANDING_THRESHOLD
                     && player_top > platform_top
                 {
                     // Land on platform

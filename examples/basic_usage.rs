@@ -10,6 +10,9 @@ use template_bevy::components::{
 use template_bevy::resources::{GameSettings, Score};
 use template_bevy::states::GameState;
 
+/// Threshold for detecting landing on platforms (in pixels)
+const LANDING_THRESHOLD: f32 = 10.0;
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
@@ -172,8 +175,10 @@ fn check_collisions(
             let h_overlap = p_left < plat_right && p_right > plat_left;
 
             if h_overlap && velocity.0.y <= 0.0 {
-                let threshold = 10.0;
-                if p_bottom <= plat_top && p_bottom >= plat_top - threshold && p_top > plat_top {
+                if p_bottom <= plat_top
+                    && p_bottom >= plat_top - LANDING_THRESHOLD
+                    && p_top > plat_top
+                {
                     player_tf.translation.y = plat_top + ph_h;
                     velocity.0.y = 0.0;
                     is_grounded = true;
