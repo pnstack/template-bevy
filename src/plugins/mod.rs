@@ -7,7 +7,10 @@ use bevy::prelude::*;
 
 use crate::resources::{GameSettings, GameTimer, Score};
 use crate::states::GameState;
-use crate::systems::{apply_velocity, player_movement, setup_camera, spawn_player};
+use crate::systems::{
+    apply_gravity, apply_velocity, check_platform_collisions, player_jump, player_movement,
+    setup_camera, spawn_platforms, spawn_player,
+};
 
 /// Main game plugin that sets up all game systems
 pub struct GamePlugin;
@@ -22,11 +25,18 @@ impl Plugin for GamePlugin {
             .init_resource::<Score>()
             .init_resource::<GameTimer>()
             // Setup systems (run once on startup)
-            .add_systems(Startup, (setup_camera, spawn_player))
+            .add_systems(Startup, (setup_camera, spawn_player, spawn_platforms))
             // Update systems (run every frame during Playing state)
+            // Order: input -> physics -> collision -> movement
             .add_systems(
                 Update,
-                (player_movement, apply_velocity)
+                (
+                    player_movement,
+                    player_jump,
+                    apply_gravity,
+                    apply_velocity,
+                    check_platform_collisions,
+                )
                     .chain()
                     .run_if(in_state(GameState::Playing)),
             )

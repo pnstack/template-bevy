@@ -74,6 +74,62 @@ impl Collider {
     }
 }
 
+/// Gravity component for entities affected by gravity
+#[derive(Component, Debug, Clone)]
+pub struct Gravity(pub f32);
+
+impl Default for Gravity {
+    fn default() -> Self {
+        Self(980.0) // Pixels per second squared
+    }
+}
+
+/// Component tracking if entity is on the ground
+#[derive(Component, Debug, Default, Clone)]
+pub struct Grounded(pub bool);
+
+/// Marker component for static platform entities
+#[derive(Component, Debug, Default)]
+pub struct Platform;
+
+/// Box collider for AABB collision detection
+#[derive(Component, Debug, Clone)]
+pub struct BoxCollider {
+    pub width: f32,
+    pub height: f32,
+}
+
+impl BoxCollider {
+    pub fn new(width: f32, height: f32) -> Self {
+        Self { width, height }
+    }
+}
+
+impl Default for BoxCollider {
+    fn default() -> Self {
+        Self {
+            width: 50.0,
+            height: 50.0,
+        }
+    }
+}
+
+/// Jump configuration component for Mario-like jumping
+#[derive(Component, Debug, Clone)]
+pub struct JumpConfig {
+    pub jump_velocity: f32,
+    pub jump_cut_multiplier: f32,
+}
+
+impl Default for JumpConfig {
+    fn default() -> Self {
+        Self {
+            jump_velocity: 450.0,
+            jump_cut_multiplier: 0.5,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -121,5 +177,38 @@ mod tests {
         let mut health = Health::new(100.0);
         health.take_damage(25.0);
         assert!((health.percentage() - 0.75).abs() < f32::EPSILON);
+    }
+
+    #[test]
+    fn test_gravity_default() {
+        let gravity = Gravity::default();
+        assert_eq!(gravity.0, 980.0);
+    }
+
+    #[test]
+    fn test_grounded_default() {
+        let grounded = Grounded::default();
+        assert!(!grounded.0);
+    }
+
+    #[test]
+    fn test_box_collider_new() {
+        let collider = BoxCollider::new(100.0, 50.0);
+        assert_eq!(collider.width, 100.0);
+        assert_eq!(collider.height, 50.0);
+    }
+
+    #[test]
+    fn test_box_collider_default() {
+        let collider = BoxCollider::default();
+        assert_eq!(collider.width, 50.0);
+        assert_eq!(collider.height, 50.0);
+    }
+
+    #[test]
+    fn test_jump_config_default() {
+        let config = JumpConfig::default();
+        assert_eq!(config.jump_velocity, 450.0);
+        assert_eq!(config.jump_cut_multiplier, 0.5);
     }
 }

@@ -10,5 +10,5 @@ pub mod constants {
     /// Default window height
     pub const WINDOW_HEIGHT: f32 = 720.0;
     /// Game title
-    pub const GAME_TITLE: &str = "Template Bevy Game";
+    pub const GAME_TITLE: &str = "2D Mario-Style Platformer";
 }
