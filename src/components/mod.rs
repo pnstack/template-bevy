@@ -130,6 +130,125 @@ impl Default for JumpConfig {
     }
 }
 
+/// Marker component for obstacle entities
+#[derive(Component, Debug, Default)]
+pub struct Obstacle;
+
+/// Auto-movement component for entities that move automatically
+#[derive(Component, Debug, Clone)]
+pub struct AutoMove {
+    /// Direction of movement (normalized)
+    pub direction: Vec2,
+    /// Movement speed
+    pub speed: f32,
+}
+
+impl Default for AutoMove {
+    fn default() -> Self {
+        Self {
+            direction: Vec2::new(-1.0, 0.0), // Move left by default
+            speed: 150.0,
+        }
+    }
+}
+
+impl AutoMove {
+    pub fn new(direction: Vec2, speed: f32) -> Self {
+        Self {
+            direction: direction.normalize_or_zero(),
+            speed,
+        }
+    }
+
+    /// Creates a left-moving auto-move component
+    pub fn left(speed: f32) -> Self {
+        Self::new(Vec2::new(-1.0, 0.0), speed)
+    }
+
+    /// Creates a right-moving auto-move component
+    pub fn right(speed: f32) -> Self {
+        Self::new(Vec2::new(1.0, 0.0), speed)
+    }
+}
+
+/// Marker component for the main camera that follows the player
+#[derive(Component, Debug, Default)]
+pub struct MainCamera;
+
+/// Camera follow configuration component
+#[derive(Component, Debug, Clone)]
+pub struct CameraFollow {
+    /// Target entity to follow (usually the player)
+    pub target: Option<Entity>,
+    /// Offset from the target position
+    pub offset: Vec3,
+    /// Smoothing factor (0.0 = instant, 1.0 = very smooth/slow)
+    pub smoothing: f32,
+}
+
+impl Default for CameraFollow {
+    fn default() -> Self {
+        Self {
+            target: None,
+            offset: Vec3::ZERO,
+            smoothing: 0.1,
+        }
+    }
+}
+
+impl CameraFollow {
+    pub fn new(target: Entity) -> Self {
+        Self {
+            target: Some(target),
+            ..Default::default()
+        }
+    }
+
+    pub fn with_offset(mut self, offset: Vec3) -> Self {
+        self.offset = offset;
+        self
+    }
+
+    pub fn with_smoothing(mut self, smoothing: f32) -> Self {
+        self.smoothing = smoothing.clamp(0.01, 1.0);
+        self
+    }
+}
+
+/// Marker component for UI root node
+#[derive(Component, Debug, Default)]
+pub struct GameUI;
+
+/// Marker component for score display UI
+#[derive(Component, Debug, Default)]
+pub struct ScoreDisplay;
+
+/// Marker component for health bar UI
+#[derive(Component, Debug, Default)]
+pub struct HealthBar;
+
+/// Marker component for health bar fill (the colored part)
+#[derive(Component, Debug, Default)]
+pub struct HealthBarFill;
+
+/// Damage value component for obstacles
+#[derive(Component, Debug, Clone)]
+pub struct DamageOnContact {
+    pub damage: f32,
+}
+
+impl Default for DamageOnContact {
+    fn default() -> Self {
+        Self { damage: 10.0 }
+    }
+}
+
+impl DamageOnContact {
+    pub fn new(damage: f32) -> Self {
+        Self { damage }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -210,5 +329,53 @@ mod tests {
         let config = JumpConfig::default();
         assert_eq!(config.jump_velocity, 450.0);
         assert_eq!(config.jump_cut_multiplier, 0.5);
+    }
+
+    #[test]
+    fn test_auto_move_default() {
+        let auto_move = AutoMove::default();
+        assert_eq!(auto_move.direction, Vec2::new(-1.0, 0.0));
+        assert_eq!(auto_move.speed, 150.0);
+    }
+
+    #[test]
+    fn test_auto_move_new() {
+        let auto_move = AutoMove::new(Vec2::new(2.0, 0.0), 200.0);
+        assert!((auto_move.direction.x - 1.0).abs() < f32::EPSILON);
+        assert_eq!(auto_move.speed, 200.0);
+    }
+
+    #[test]
+    fn test_auto_move_left() {
+        let auto_move = AutoMove::left(100.0);
+        assert_eq!(auto_move.direction, Vec2::new(-1.0, 0.0));
+        assert_eq!(auto_move.speed, 100.0);
+    }
+
+    #[test]
+    fn test_auto_move_right() {
+        let auto_move = AutoMove::right(100.0);
+        assert_eq!(auto_move.direction, Vec2::new(1.0, 0.0));
+        assert_eq!(auto_move.speed, 100.0);
+    }
+
+    #[test]
+    fn test_camera_follow_default() {
+        let follow = CameraFollow::default();
+        assert!(follow.target.is_none());
+        assert_eq!(follow.offset, Vec3::ZERO);
+        assert!((follow.smoothing - 0.1).abs() < f32::EPSILON);
+    }
+
+    #[test]
+    fn test_damage_on_contact_default() {
+        let damage = DamageOnContact::default();
+        assert_eq!(damage.damage, 10.0);
+    }
+
+    #[test]
+    fn test_damage_on_contact_new() {
+        let damage = DamageOnContact::new(25.0);
+        assert_eq!(damage.damage, 25.0);
     }
 }

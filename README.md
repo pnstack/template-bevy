@@ -9,6 +9,11 @@ A Bevy game engine template designed for indie game developers. This template pr
 - 🧩 Modular plugin system
 - 🎯 Game state management (Loading, Menu, Playing, Paused, GameOver)
 - 🏃 Movement and physics components
+- 🤖 Auto-movement system for obstacles and NPCs
+- 💥 AABB collision detection system
+- 🎯 Dynamic obstacle spawning with randomization
+- 📷 Smooth camera follow system
+- 🎨 User interface with score display and health bar
 - ❤️ Health and combat systems
 - 🎵 Audio and settings resources
 - 🧪 Comprehensive test suite
@@ -53,7 +58,8 @@ cargo run --release
 
 ### Controls
 
-- **WASD** or **Arrow Keys** - Move player
+- **A/D** or **Arrow Left/Right** - Move player horizontally
+- **Spacebar** - Jump (only when on ground)
 - **ESC** - Quit game
 
 ## Project Structure
@@ -131,6 +137,60 @@ use template_bevy::states::GameState;
 
 app.add_systems(Update, gameplay_system.run_if(in_state(GameState::Playing)));
 ```
+
+## Core Systems
+
+The template includes several ready-to-use systems:
+
+### Auto-Movement
+
+Entities with the `AutoMove` component will automatically move in the specified direction:
+
+```rust
+use template_bevy::components::{AutoMove, Obstacle};
+
+// Create an obstacle that moves left
+commands.spawn((
+    Obstacle,
+    AutoMove::left(150.0), // Speed of 150 pixels/second
+    // ... other components
+));
+```
+
+### Obstacle Spawning
+
+The `spawn_obstacles` system automatically spawns obstacles at regular intervals with random properties (position, size, speed).
+
+### Camera Follow
+
+The camera automatically follows the player with smooth interpolation:
+
+```rust
+use template_bevy::components::{CameraFollow, MainCamera};
+
+// Camera will smoothly follow the target
+commands.spawn((
+    MainCamera,
+    CameraFollow::new(player_entity)
+        .with_offset(Vec3::new(0.0, 50.0, 0.0))
+        .with_smoothing(0.05),
+    Camera2dBundle::default(),
+));
+```
+
+### Collision Detection
+
+AABB collision detection between player and obstacles:
+
+- Platform collisions for landing and ground detection
+- Obstacle collisions that apply damage to the player
+
+### User Interface
+
+Built-in UI components for displaying game information:
+
+- **Score Display**: Shows current score in the top-left corner
+- **Health Bar**: Visual health indicator with color changes based on health level
 
 ## Development
 
