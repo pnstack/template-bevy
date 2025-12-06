@@ -5,11 +5,13 @@
 
 use bevy::prelude::*;
 
-use crate::resources::{GameSettings, GameTimer, Score};
+use crate::resources::{GameSettings, GameTimer, ObstacleSpawnTimer, Score};
 use crate::states::GameState;
 use crate::systems::{
-    apply_gravity, apply_velocity, check_platform_collisions, player_jump, player_movement,
-    setup_camera, spawn_platforms, spawn_player,
+    apply_auto_movement, apply_gravity, apply_velocity, camera_follow_system,
+    check_obstacle_collisions, check_platform_collisions, despawn_offscreen_obstacles, player_jump,
+    player_movement, setup_camera, setup_camera_follow, spawn_game_ui, spawn_obstacles,
+    spawn_platforms, spawn_player, update_health_bar, update_score_display,
 };
 
 /// Main game plugin that sets up all game systems
@@ -24,18 +26,37 @@ impl Plugin for GamePlugin {
             .init_resource::<GameSettings>()
             .init_resource::<Score>()
             .init_resource::<GameTimer>()
+            .init_resource::<ObstacleSpawnTimer>()
             // Setup systems (run once on startup)
-            .add_systems(Startup, (setup_camera, spawn_player, spawn_platforms))
+            .add_systems(
+                Startup,
+                (setup_camera, spawn_player, spawn_platforms, spawn_game_ui),
+            )
+            // Post-startup setup for camera follow (after player is spawned)
+            .add_systems(OnEnter(GameState::Playing), setup_camera_follow)
             // Update systems (run every frame during Playing state)
-            // Order: input -> physics -> collision -> movement
+            // Order: input -> physics -> collision -> movement -> camera -> UI
             .add_systems(
                 Update,
                 (
+                    // Player input systems
                     player_movement,
                     player_jump,
+                    // Physics systems
                     apply_gravity,
                     apply_velocity,
+                    apply_auto_movement,
+                    // Collision systems
                     check_platform_collisions,
+                    check_obstacle_collisions,
+                    // Obstacle spawning and cleanup
+                    spawn_obstacles,
+                    despawn_offscreen_obstacles,
+                    // Camera system
+                    camera_follow_system,
+                    // UI systems
+                    update_score_display,
+                    update_health_bar,
                 )
                     .chain()
                     .run_if(in_state(GameState::Playing)),

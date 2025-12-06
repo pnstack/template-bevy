@@ -82,6 +82,28 @@ impl GameTimer {
     }
 }
 
+/// Obstacle spawn timer resource
+#[derive(Resource, Debug)]
+pub struct ObstacleSpawnTimer {
+    pub timer: Timer,
+}
+
+impl Default for ObstacleSpawnTimer {
+    fn default() -> Self {
+        Self {
+            timer: Timer::from_seconds(2.0, TimerMode::Repeating),
+        }
+    }
+}
+
+impl ObstacleSpawnTimer {
+    pub fn new(interval_seconds: f32) -> Self {
+        Self {
+            timer: Timer::from_seconds(interval_seconds, TimerMode::Repeating),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

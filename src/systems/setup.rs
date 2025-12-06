@@ -3,12 +3,17 @@
 use bevy::prelude::*;
 
 use crate::components::{
-    BoxCollider, Gravity, Grounded, Health, JumpConfig, Platform, Player, Speed, Velocity,
+    BoxCollider, CameraFollow, Gravity, Grounded, Health, JumpConfig, MainCamera, Platform, Player,
+    Speed, Velocity,
 };
 
-/// Spawns a 2D camera for the game
+/// Spawns a 2D camera for the game with MainCamera marker
 pub fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((
+        MainCamera,
+        CameraFollow::default(),
+        Camera2dBundle::default(),
+    ));
 }
 
 /// Spawns the player entity with platformer components
