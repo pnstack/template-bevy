@@ -3,6 +3,7 @@
 use bevy::prelude::*;
 
 use crate::components::{BoxCollider, DamageOnContact, Health, Obstacle, Player};
+use crate::game::constants::scoring::OBSTACLE_SURVIVE_POINTS;
 use crate::resources::Score;
 
 /// Checks for collisions between player and obstacles
@@ -50,8 +51,8 @@ pub fn check_obstacle_collisions(
             // Remove the obstacle
             commands.entity(obstacle_entity).despawn();
 
-            // Add score for surviving
-            score.add(10);
+            // Add score for surviving collision
+            score.add(OBSTACLE_SURVIVE_POINTS);
         }
     }
 }

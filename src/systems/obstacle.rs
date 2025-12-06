@@ -4,6 +4,10 @@ use bevy::prelude::*;
 use rand::Rng;
 
 use crate::components::{AutoMove, BoxCollider, DamageOnContact, Obstacle};
+use crate::game::constants::obstacles::{
+    DESPAWN_X, HEIGHT_MAX, HEIGHT_MIN, SPAWN_X, SPAWN_Y_MAX, SPAWN_Y_MIN, SPEED_MAX, SPEED_MIN,
+    WIDTH_MAX, WIDTH_MIN,
+};
 use crate::resources::ObstacleSpawnTimer;
 
 /// Spawns obstacles at regular intervals
@@ -18,15 +22,15 @@ pub fn spawn_obstacles(
         let mut rng = rand::thread_rng();
 
         // Random spawn position on the right side of the screen
-        let spawn_x = 700.0;
-        let spawn_y = rng.gen_range(-200.0..150.0);
+        let spawn_x = SPAWN_X;
+        let spawn_y = rng.gen_range(SPAWN_Y_MIN..SPAWN_Y_MAX);
 
         // Random obstacle size
-        let width = rng.gen_range(30.0..60.0);
-        let height = rng.gen_range(30.0..60.0);
+        let width = rng.gen_range(WIDTH_MIN..WIDTH_MAX);
+        let height = rng.gen_range(HEIGHT_MIN..HEIGHT_MAX);
 
         // Random speed
-        let speed = rng.gen_range(100.0..250.0);
+        let speed = rng.gen_range(SPEED_MIN..SPEED_MAX);
 
         commands.spawn((
             Obstacle,
@@ -53,7 +57,7 @@ pub fn despawn_offscreen_obstacles(
 ) {
     for (entity, transform) in query.iter() {
         // Despawn if too far left
-        if transform.translation.x < -800.0 {
+        if transform.translation.x < DESPAWN_X {
             commands.entity(entity).despawn();
         }
     }

@@ -3,6 +3,7 @@
 use bevy::prelude::*;
 
 use crate::components::{CameraFollow, MainCamera, Player};
+use crate::game::constants::camera::TARGET_FRAMERATE;
 
 /// Updates camera to follow the target entity smoothly
 pub fn camera_follow_system(
@@ -17,8 +18,11 @@ pub fn camera_follow_system(
     for (mut camera_transform, camera_follow) in camera_query.iter_mut() {
         let target_position = player_transform.translation + camera_follow.offset;
 
-        // Smooth camera movement using lerp
-        let lerp_factor = 1.0 - camera_follow.smoothing.powf(time.delta_seconds() * 60.0);
+        // Smooth camera movement using lerp (frame-rate independent)
+        let lerp_factor = 1.0
+            - camera_follow
+                .smoothing
+                .powf(time.delta_seconds() * TARGET_FRAMERATE);
         camera_transform.translation.x = camera_transform
             .translation
             .x

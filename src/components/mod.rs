@@ -6,6 +6,8 @@
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
+use crate::game::constants::camera::{MAX_SMOOTHING, MIN_SMOOTHING};
+
 /// Marker component for the player entity
 #[derive(Component, Debug, Default)]
 pub struct Player;
@@ -210,7 +212,7 @@ impl CameraFollow {
     }
 
     pub fn with_smoothing(mut self, smoothing: f32) -> Self {
-        self.smoothing = smoothing.clamp(0.01, 1.0);
+        self.smoothing = smoothing.clamp(MIN_SMOOTHING, MAX_SMOOTHING);
         self
     }
 }
